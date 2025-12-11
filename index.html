@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Do-To-Do</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      const colors = ['blue', 'red', 'rose', 'amber', 'orange', 'teal', 'emerald', 'violet', 'purple', 'pink', 'fuchsia', 'sky', 'cyan', 'indigo', 'yellow', 'gray', 'slate', 'zinc', 'stone', 'lime', 'green'];
+      const safelist = [];
+      
+      colors.forEach(c => {
+          // Gradients - Full range for dynamic avatar backgrounds
+          safelist.push(`from-${c}-100`, `from-${c}-200`, `from-${c}-300`, `from-${c}-400`, `from-${c}-500`, `from-${c}-600`, `from-${c}-700`, `from-${c}-800`, `from-${c}-900`, `from-${c}-950`);
+          safelist.push(`to-${c}-100`, `to-${c}-200`, `to-${c}-300`, `to-${c}-400`, `to-${c}-500`, `to-${c}-600`, `to-${c}-700`, `to-${c}-800`, `to-${c}-900`, `to-${c}-950`);
+          
+          // Backgrounds
+          safelist.push(`bg-${c}-50`, `bg-${c}-100`, `bg-${c}-200`, `bg-${c}-300`, `bg-${c}-400`, `bg-${c}-500`, `bg-${c}-600`, `bg-${c}-700`, `bg-${c}-800`, `bg-${c}-900`, `bg-${c}-950`);
+          
+          // Text
+          safelist.push(`text-${c}-300`, `text-${c}-400`, `text-${c}-500`, `text-${c}-600`, `text-${c}-700`, `text-${c}-800`, `text-${c}-900`);
+          
+          // Borders & Rings
+          safelist.push(`border-${c}-200`, `border-${c}-300`, `border-${c}-400`, `border-${c}-500`, `border-${c}-600`, `border-${c}-700`, `border-${c}-800`);
+          safelist.push(`ring-${c}-100`, `ring-${c}-200`, `ring-${c}-300`, `ring-${c}-400`, `ring-${c}-500`, `ring-${c}-600`);
+          
+          // Shadows
+          safelist.push(`shadow-${c}-500/30`);
+      });
+
+      // Special background opacities used in dashboards
+      safelist.push('bg-green-900/10', 'bg-green-900/30', 'bg-blue-900/30', 'bg-teal-900/30', 'bg-purple-900/30', 'bg-red-900/30', 'bg-orange-900/30');
+
+      tailwind.config = {
+        darkMode: 'class',
+        safelist: safelist,
+        theme: {
+          extend: {
+            colors: {
+              gray: {
+                750: '#2d3748',
+                850: '#1a202c',
+                950: '#171923',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Mobile Drag and Drop Polyfill -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/default.css">
+    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
+    <script>
+        // options are optional ;)
+        MobileDragDrop.polyfill({
+            // use this to make use of the scroll behaviour
+            dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+        });
+        
+        // fix for scroll issue on mobile
+        window.addEventListener( 'touchmove', function() {}, {passive: false});
+    </script>
+
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      /* Custom Scrollbar for cleaner look */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(156, 163, 175, 0.5);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(156, 163, 175, 0.8);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "framer-motion": "https://aistudiocdn.com/framer-motion@^12.23.25",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0",
+    "react-beautiful-dnd": "https://aistudiocdn.com/react-beautiful-dnd@^13.1.1",
+    "canvas-confetti": "https://aistudiocdn.com/canvas-confetti@^1.9.2",
+    "html-to-image": "https://aistudiocdn.com/html-to-image@^1.11.11"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

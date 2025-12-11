@@ -1,0 +1,5 @@
+{
+  "name": "Do-To-Do",
+  "description": "A gamified productivity app that tracks your tasks, schedules your calendar, and rewards you with points for finishing early while penalizing procrastination. Features dynamic theming based on your performance level.",
+  "requestFramePermissions": []
+}
