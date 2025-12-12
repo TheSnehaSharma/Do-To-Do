@@ -161,7 +161,68 @@ const App: React.FC = () => {
   useEffect(() => { localStorage.setItem('karma_user', JSON.stringify(user)); }, [user]);
   useEffect(() => { localStorage.setItem('karma_routines', JSON.stringify(routines)); }, [routines]);
 
-  // Intro Animation Timer logic is now handled by the component's onComplete prop
+  // History API Integration for Back Button
+  useEffect(() => {
+    // Set initial history state
+    window.history.replaceState({ view: 'tasks', modal: null }, '');
+
+    const handlePopState = (event: PopStateEvent) => {
+        const state = event.state;
+        if (state) {
+            // Restore View
+            if (state.view) setActivePage(state.view);
+            
+            // Restore Modal State
+            setIsModalOpen(state.modal === 'task');
+            setIsAccountOpen(state.modal === 'account');
+            setIsProfileCardOpen(state.modal === 'profile');
+            
+            // If going back to a state without modals, ensure everything is closed
+            if (!state.modal) {
+                // Ensure other potential overlays are closed
+                setIsFilterExpanded(false);
+                setIsSidebarOpen(false);
+            }
+        } else {
+            // Fallback if state is null (shouldn't happen with our push logic, but good for safety)
+            setIsModalOpen(false);
+            setIsAccountOpen(false);
+            setIsProfileCardOpen(false);
+        }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Navigation Helper
+  const navigateToPage = (page: string) => {
+      if (activePage === page) return;
+      window.history.pushState({ view: page, modal: null }, '');
+      setActivePage(page);
+  };
+
+  const openTaskModal = (task?: Task) => {
+      window.history.pushState({ view: activePage, modal: 'task' }, '');
+      setEditingTask(task);
+      setIsModalOpen(true);
+      setIsSidebarCollapsed(true);
+  };
+
+  const openAccountModal = () => {
+      window.history.pushState({ view: activePage, modal: 'account' }, '');
+      setIsAccountOpen(true);
+      setIsSidebarOpen(false);
+  };
+
+  const openProfileCard = () => {
+      window.history.pushState({ view: activePage, modal: 'profile' }, '');
+      setIsProfileCardOpen(true);
+  };
+
+  const closeWithBack = () => {
+      window.history.back();
+  };
 
   // Filter Menu Open Initialization
   useEffect(() => {
@@ -189,9 +250,6 @@ const App: React.FC = () => {
     const newEvents: LevelUpEvent[] = [];
 
     if (currentRank !== prevRankRef.current) {
-        // Only trigger rank up event if we are moving UP tiers (simple check via points)
-        // or just rely on change detection. Since level can drop, we might want to only show celebration on promotion.
-        // For simplicity, we show whenever the Enum changes and points > previous (promotion)
         if (user.points > (prevNumericLevelRef.current * 100)) { 
              newEvents.push({ type: 'rank', oldVal: prevRankRef.current, newVal: currentRank });
         }
@@ -247,9 +305,10 @@ const App: React.FC = () => {
     }
   }, [user.isDarkMode]);
 
-  // --- OPTIMIZED ALARM LOGIC ---
+  // --- OPTIMIZED ALARM LOGIC WITH WEB WORKER ---
   const lastCheckedMinuteRef = useRef<string>('');
   const alarmDataRef = useRef({ tasks, routines, user, activeAlarm }); // Access latest state without re-effecting
+  const workerRef = useRef<Worker | null>(null);
 
   // Update ref when dependencies change
   useEffect(() => {
@@ -260,6 +319,20 @@ const App: React.FC = () => {
     if ('Notification' in window && Notification.permission !== 'granted') {
       Notification.requestPermission();
     }
+
+    // Initialize Web Worker for intervals
+    const workerCode = `
+      self.onmessage = function(e) {
+         if (e.data === 'start') {
+             setInterval(() => {
+                 self.postMessage('tick');
+             }, 5000);
+         }
+      };
+    `;
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    workerRef.current = new Worker(URL.createObjectURL(blob));
+    workerRef.current.postMessage('start');
 
     const checkAlarms = () => {
       const { tasks, routines, user, activeAlarm } = alarmDataRef.current;
@@ -297,17 +370,33 @@ const App: React.FC = () => {
            if (user.notificationsEnabled !== false) {
              const label = task.isRoutine ? "Routine Reminder" : "Task Reminder";
              if ('Notification' in window && Notification.permission === 'granted') {
-               new Notification(`⏰ ${label}: ${task.title}`, {
-                 body: `It's time for: ${task.title}`,
-               });
+               try {
+                   new Notification(`⏰ ${label}`, {
+                     body: `${task.title}\nIt's time!`,
+                     tag: `alarm-${task.id}-${timeKey}`, // Prevent duplicates
+                     renotify: true,
+                     requireInteraction: true // Keep notification until interaction
+                   } as any);
+               } catch (e) {
+                   console.error("Notification error", e);
+               }
              }
            }
         });
       }
     };
 
-    const intervalId = setInterval(checkAlarms, 5000); 
-    return () => clearInterval(intervalId);
+    workerRef.current.onmessage = (e) => {
+        if (e.data === 'tick') {
+            checkAlarms();
+        }
+    };
+
+    return () => {
+        if (workerRef.current) {
+            workerRef.current.terminate();
+        }
+    };
   }, []); 
   // --- END ALARM LOGIC ---
 
@@ -744,12 +833,6 @@ const App: React.FC = () => {
       setIsFilterExpanded(false);
   };
 
-  const openTaskModal = (task?: Task) => {
-      setEditingTask(task);
-      setIsModalOpen(true);
-      setIsSidebarCollapsed(true);
-  };
-
   const toggleFilterMenu = () => {
       const newState = !isFilterExpanded;
       setIsFilterExpanded(newState);
@@ -900,7 +983,7 @@ const App: React.FC = () => {
                 {user.isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
              </button>
              <div className="relative">
-                 <button onClick={() => setIsProfileCardOpen(true)} className="relative flex flex-col items-center justify-center transition-transform hover:scale-105 active:scale-95 group">
+                 <button onClick={openProfileCard} className="relative flex flex-col items-center justify-center transition-transform hover:scale-105 active:scale-95 group">
                     <div className={`relative w-9 h-9 rounded-full overflow-hidden flex items-center justify-center shadow-sm border-2 border-gray-600 bg-gray-200`}>
                         <div className={`absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out bg-${themeColor}-600`} style={{ height: `${levelProgress}%` }} />
                         <span className={`relative z-10 font-black text-xs text-gray-600`}>{numericLevel}</span>
@@ -911,7 +994,7 @@ const App: React.FC = () => {
       </header>
       
       <div className="flex-1 flex overflow-hidden relative">
-        <Sidebar isOpen={isSidebarOpen} isCollapsed={isSidebarCollapsed} onClose={() => setIsSidebarOpen(false)} activePage={activePage} onNavigate={setActivePage} onProfileClick={() => { setIsAccountOpen(true); setIsSidebarOpen(false); }} user={user} themeColor={themeColor} isDark={user.isDarkMode} />
+        <Sidebar isOpen={isSidebarOpen} isCollapsed={isSidebarCollapsed} onClose={() => setIsSidebarOpen(false)} activePage={activePage} onNavigate={(page) => navigateToPage(page)} onProfileClick={openAccountModal} user={user} themeColor={themeColor} isDark={user.isDarkMode} />
 
         <main className="flex-1 overflow-hidden bg-inherit relative flex flex-col">
             <AnimatePresence mode="wait">
@@ -932,7 +1015,7 @@ const App: React.FC = () => {
                                          </div>
                                          <button onClick={toggleFilterMenu} className={`px-3 py-1.5 rounded-lg border shadow-sm transition-colors flex items-center gap-2 flex-shrink-0 ${isFilterExpanded ? `bg-${themeColor}-100 border-${themeColor}-300 text-${themeColor}-700` : (isDark ? 'bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700' : `bg-white/80 border-${themeColor}-200 text-gray-500 hover:bg-${themeColor}-50`)}`}><Filter size={16} /></button>
                                          {isFilterExpanded && (
-                                            <div className={`absolute top-full left-0 mt-2 rounded-xl border shadow-2xl z-50 flex flex-col w-full overflow-hidden animate-in slide-in-from-top-2 duration-200 ${isDark ? 'bg-gray-900 border-gray-700' : `bg-white/90 backdrop-blur-xl border-${themeColor}-200`}`}>
+                                            <div className={`z-50 flex flex-col overflow-hidden animate-in slide-in-from-top-2 duration-200 fixed left-2 right-2 top-32 w-auto md:absolute md:top-full md:left-0 md:w-[600px] md:mt-2 rounded-xl border shadow-2xl ${isDark ? 'bg-gray-900 border-gray-700' : `bg-white/90 backdrop-blur-xl border-${themeColor}-200`}`}>
                                                 <div className="flex flex-1 h-[300px]">
                                                     <div className={`w-5/12 border-r p-2 space-y-1 ${isDark ? 'bg-gray-800/50 border-gray-700' : `bg-gray-50/80 border-${themeColor}-100`}`}>
                                                         {[{ id: 'sort', label: 'Sort By', icon: ArrowUpDown }, { id: 'priority', label: 'Priority', icon: Flag }, { id: 'section', label: 'Section', icon: ListIcon }, { id: 'date', label: 'Date', icon: CalendarIcon }].map(cat => (
@@ -979,15 +1062,20 @@ const App: React.FC = () => {
             </AnimatePresence>
             
             <Suspense fallback={null}>
-                {isModalOpen && <TaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSave={handleSaveTask} initialTask={editingTask} sections={sections} themeColor={themeColor} isDark={user.isDarkMode} />}
-                {isAccountOpen && <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} user={user} onUpdateUser={handleUpdateUser} themeColor={themeColor} />}
-                {isProfileCardOpen && <ProfileCardModal isOpen={isProfileCardOpen} onClose={() => setIsProfileCardOpen(false)} user={user} tasks={tasks} themeColor={themeColor} isDark={user.isDarkMode} />}
+                {isModalOpen && <TaskModal isOpen={isModalOpen} onClose={closeWithBack} onSave={handleSaveTask} initialTask={editingTask} sections={sections} themeColor={themeColor} isDark={user.isDarkMode} />}
+                {isAccountOpen && <AccountModal isOpen={isAccountOpen} onClose={closeWithBack} user={user} onUpdateUser={handleUpdateUser} themeColor={themeColor} />}
+                {isProfileCardOpen && <ProfileCardModal isOpen={isProfileCardOpen} onClose={closeWithBack} user={user} tasks={tasks} themeColor={themeColor} isDark={user.isDarkMode} />}
             </Suspense>
         </main>
         {/* Toast and FAB ... */}
         <AnimatePresence>
             {toast && (
-                <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'}`}>
+                <motion.div 
+                    initial={{ opacity: 0, y: 50, x: "-50%" }} 
+                    animate={{ opacity: 1, y: 0, x: "-50%" }} 
+                    exit={{ opacity: 0, y: 50, x: "-50%" }} 
+                    className={`fixed bottom-12 md:bottom-8 left-1/2 z-[200] px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-gray-900 text-white'}`}
+                >
                     {toast.type === 'error' && <AlertCircle size={18} />}
                     <span className="font-bold text-sm">{toast.message}</span>
                     {toast.action && (
@@ -1004,7 +1092,7 @@ const App: React.FC = () => {
       </div>
 
       {activePage === 'tasks' && !isAnyModalOpen && (
-        <button onClick={() => { setEditingTask(undefined); setIsModalOpen(true); setIsSidebarOpen(false); setIsSidebarCollapsed(true); }} className={`fixed bottom-8 right-8 w-14 h-14 bg-${themeColor}-600 hover:bg-${themeColor}-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-[80]`}>
+        <button onClick={() => openTaskModal(undefined)} className={`fixed bottom-8 right-8 w-14 h-14 bg-${themeColor}-600 hover:bg-${themeColor}-700 text-white rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-[80]`}>
             <Plus size={28} />
         </button>
       )}

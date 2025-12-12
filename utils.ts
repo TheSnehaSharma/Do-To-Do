@@ -96,6 +96,24 @@ export const calculateStreak = (tasks: Task[]): number => {
     return streak;
 };
 
+export const getShareText = (level: UserLevel, numericLevel: number) => {
+  const appLink = "https://dotodo.app";
+  switch (level) {
+    case UserLevel.Proactive:
+      return `I'm mastering my time with DoToDo! 🚀 Level ${numericLevel} and climbing. Can you beat my streak? Join here: ${appLink}`;
+    case UserLevel.Prepared:
+      return `Consistency feels good. 🛡️ Reached Level ${numericLevel} on DoToDo. Start your journey: ${appLink}`;
+    case UserLevel.Punctual:
+      return `Building better habits every day. ⏰ Just hit Level ${numericLevel} on DoToDo. Join me: ${appLink}`;
+    case UserLevel.Postponer:
+      return `Getting back on track! 💪 Level ${numericLevel} on DoToDo. It's time to focus. Join me: ${appLink}`;
+    case UserLevel.Procrastinator:
+      return `Turning over a new leaf. 🔥 Level ${numericLevel} on DoToDo. Let's do this together: ${appLink}`;
+    default:
+      return `Check out my progress on DoToDo! Level ${numericLevel}. Join here: ${appLink}`;
+  }
+};
+
 // Detailed 15 Characters with Diverse Emotions - Sanitized for reliability
 // Using strictly valid 'mouth' variants for Lorelei: happy01-18, sad01-03
 export const AVATARS = [
