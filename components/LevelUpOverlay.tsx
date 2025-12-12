@@ -5,7 +5,8 @@ import { Trophy, Star, ArrowUp, Share2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { LevelUpEvent, UserState, Task, UserLevel, THEME_COLORS } from '../types';
 import { ProfileCard } from './ProfileCardModal';
-import { getThemeColor, getNumericLevel, calculateStreak } from '../utils';
+import { getThemeColor, getNumericLevel, calculateStreak, getShareText } from '../utils';
+import { toBlob } from 'html-to-image';
 
 interface LevelUpOverlayProps {
   data: LevelUpEvent | null;
@@ -104,8 +105,6 @@ export const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ data, onClose, t
     setIsSharing(true);
 
     try {
-        const { toBlob } = await import('html-to-image');
-        
         // Target the inner ProfileCard which should be the first child
         const node = cardContainerRef.current.querySelector('[data-card-ref="profile-card"]') as HTMLElement;
         if (!node) throw new Error("Card node not found");
@@ -120,16 +119,22 @@ export const LevelUpOverlay: React.FC<LevelUpOverlayProps> = ({ data, onClose, t
         });
         
         if (blob) {
-            const file = new File([blob], 'my-rank-up.png', { type: 'image/png' });
+            const cleanName = (user.name || 'User').replace(/[^a-z0-9]/gi, '_');
+            const fileName = `DoToDo-${cleanName}-RankUp.png`;
+            const file = new File([blob], fileName, { type: 'image/png' });
+            
+            // Get motivational message
+            const shareText = getShareText(user.level, getNumericLevel(user.points));
+
             if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     title: 'Rank Up!',
-                    text: `I just reached ${user.level} rank on Do-To-Do!`,
+                    text: shareText,
                     files: [file]
                 });
             } else {
                 const link = document.createElement('a');
-                link.download = 'my-rank-up.png';
+                link.download = `DoToDo-${user.name || 'User'}-RankUp.png`;
                 link.href = URL.createObjectURL(blob);
                 link.click();
             }

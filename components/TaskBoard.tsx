@@ -152,7 +152,14 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, sections, onTaskMov
                 else if (type === 'TASK' && draggedTaskId) { onTaskMove(draggedTaskId, sectionId); setDraggedTaskId(null); }
             }}>
             <div className={`p-4 border-b rounded-t-xl group/header relative flex justify-between items-center ${color !== 'gray' ? (isDark ? `bg-${color}-900/30 border-${color}-800` : `bg-${color}-100 border-${color}-200`) : (isDark ? 'border-gray-700 bg-gray-750' : `border-${themeColor}-200/30 bg-white/50`)}`}>
-                {!isGeneral && <div className={`absolute top-1 left-1/2 -translate-x-1/2 cursor-move opacity-30 hover:opacity-100 p-1 transition-opacity ${isDark ? 'text-gray-200' : 'text-gray-800'}`}><GripVertical size={16} className="rotate-90" /></div>}
+                {!isGeneral && (
+                    <div 
+                        className={`absolute top-1 left-1/2 -translate-x-1/2 cursor-move opacity-50 hover:opacity-100 p-2 touch-none transition-opacity ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <GripVertical size={16} className="rotate-90" />
+                    </div>
+                )}
                 <div className="flex items-center gap-2">
                     <button onClick={() => setCollapsedSections(prev => { const next = new Set(prev); const id = sectionId || 'general'; if (next.has(id)) next.delete(id); else next.add(id); return next; })} className="p-1 rounded hover:bg-black/10 transition-colors">{isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}</button>
                     <h3 className={`font-bold ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{title}</h3>

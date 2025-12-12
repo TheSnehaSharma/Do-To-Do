@@ -2,7 +2,8 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { UserState, Task } from '../types';
 import { Share2, Trophy, Flame, CheckCircle2 } from 'lucide-react';
-import { getAvatar, getNumericLevel } from '../utils';
+import { getAvatar, getNumericLevel, getShareText } from '../utils';
+import { toBlob } from 'html-to-image';
 
 // Helper functions to replace missing date-fns exports
 const startOfDay = (d: Date | number | string) => {
@@ -248,18 +249,11 @@ export const ProfileCardModal: React.FC<ProfileCardModalProps> = ({
 
   if (!isOpen) return null;
 
-  const currentLevel = getNumericLevel(user.points);
-
   const handleShare = async () => {
     if (!cardRef.current) return;
     setIsSharing(true);
 
-    // Delay to ensure fonts and images are fully rendered
-    await new Promise(resolve => setTimeout(resolve, 800));
-
     try {
-        const { toBlob } = await import('html-to-image');
-
         const blob = await toBlob(cardRef.current, {
             quality: 1.0,
             pixelRatio: 2.5, // slightly reduced for better compatibility on mobile safari
@@ -276,13 +270,18 @@ export const ProfileCardModal: React.FC<ProfileCardModalProps> = ({
         });
         
         if (blob) {
-            const file = new File([blob], 'my-doto-profile.png', { type: 'image/png' });
+            const cleanName = (user.name || 'User').replace(/[^a-z0-9]/gi, '_');
+            const fileName = `DoToDo-${cleanName}.png`;
+            const file = new File([blob], fileName, { type: 'image/png' });
             
+            // Get motivational message
+            const shareText = getShareText(user.level, getNumericLevel(user.points));
+
             if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
                         title: 'Do-To-Do Profile',
-                        text: `Check out my progress on Do-To-Do! Level ${currentLevel} - ${user.points} Points`,
+                        text: shareText,
                         files: [file]
                     });
                 } catch (e) {
@@ -291,7 +290,7 @@ export const ProfileCardModal: React.FC<ProfileCardModalProps> = ({
             } else {
                 // Fallback download
                 const link = document.createElement('a');
-                link.download = 'my-doto-profile.png';
+                link.download = fileName;
                 link.href = URL.createObjectURL(blob);
                 link.click();
             }

@@ -518,8 +518,9 @@ export const TimelineModal: React.FC<TimelineModalProps> = ({
            )}
 
            <div 
-                className="flex-1 overflow-y-auto relative custom-scrollbar" 
+                className="flex-1 overflow-y-auto relative custom-scrollbar touch-pan-y" 
                 ref={timelineRef}
+                style={{ touchAction: 'pan-y' }}
                 onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }}
                 onDrop={handleDropOnTimeline}
            >

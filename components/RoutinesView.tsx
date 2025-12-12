@@ -569,7 +569,8 @@ export const RoutinesView: React.FC<RoutinesViewProps> = ({
                 </div>
                 
                 <div 
-                    className="flex-1 overflow-y-auto relative custom-scrollbar touch-none"
+                    className="flex-1 overflow-y-auto relative custom-scrollbar touch-pan-y"
+                    style={{ touchAction: 'pan-y' }}
                     ref={timelineRef}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
