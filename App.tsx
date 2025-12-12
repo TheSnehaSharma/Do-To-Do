@@ -878,28 +878,18 @@ const App: React.FC = () => {
                 <Menu size={24} />
              </button>
              <div className="flex items-center gap-2">
-                {/* Composed Todo List Icon (Header) */}
-                <div className={`w-8 h-8 rounded-xl bg-gradient-to-br from-${themeColor}-500 to-${themeColor}-700 flex items-center justify-center text-white shadow-lg relative overflow-hidden group`}>
-                     {/* List Lines Background */}
-                     <div className="flex flex-col gap-[3px] opacity-60">
-                         <div className="w-4 h-[2px] bg-gradient-to-r from-white to-white/40 rounded-full" />
-                         <div className="w-4 h-[2px] bg-gradient-to-r from-white to-white/40 rounded-full" />
-                         <div className="w-2 h-[2px] bg-gradient-to-r from-white to-white/40 rounded-full" />
-                     </div>
-                     {/* Animated Check */}
-                     <motion.div
-                         initial={{ scale: 0 }}
-                         animate={{ scale: 1 }}
-                         transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-                         className="absolute inset-0 flex items-center justify-center"
-                     >
-                         <motion.div
-                            animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }}
-                            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", repeatDelay: 1 }}
-                         >
-                            <Check strokeWidth={4} size={20} className="drop-shadow-sm text-white" />
-                         </motion.div>
-                     </motion.div>
+                {/* Composed Todo List Icon (Header) - Theme Colored Box, White Elements */}
+                <div className={`w-8 h-8 rounded-xl bg-gradient-to-br from-${themeColor}-500 to-${themeColor}-700 flex items-center justify-center shadow-lg relative overflow-hidden group`}>
+                     <svg viewBox="0 0 100 100" className="w-6 h-6">
+                        {/* Circle on Left */}
+                        <circle cx="30" cy="50" r="16" fill="none" stroke="white" strokeWidth="8" strokeLinecap="round" />
+                        {/* Tick Inside Circle */}
+                        <path d="M 23 50 L 29 56 L 39 43" fill="none" stroke="white" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+                        {/* Lines on Right */}
+                        <line x1="58" y1="35" x2="85" y2="35" stroke="white" strokeWidth="8" strokeLinecap="round" />
+                        <line x1="58" y1="50" x2="85" y2="50" stroke="white" strokeWidth="8" strokeLinecap="round" />
+                        <line x1="58" y1="65" x2="85" y2="65" stroke="white" strokeWidth="8" strokeLinecap="round" />
+                     </svg>
                 </div>
                 <h1 className="text-xl font-black tracking-tight block">Do-<span className={`text-${themeColor}-600`}>To</span>-Do</h1>
             </div>
