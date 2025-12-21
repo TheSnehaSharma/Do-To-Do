@@ -2,6 +2,8 @@
 
 **Do To Do** is a gamified productivity web application designed to help you manage tasks, build routines, schedule events, and understand your productivity patterns. With dynamic color themes, points-based motivation, a shareable profile card, and both board and list task views, **Do To Do** transforms your workflow into a rewarding experience.
 
+Visit the site Live at https://dotodo-one.vercel.app/
+
 ---
 
 ## 🚀 Features
@@ -9,16 +11,16 @@
 ### 📝 Four Main Menus
 **Do To Do** is organized into four easy-to-use sections:
 
-1. **Tasks** – Manage your to-dos with board and list views  
-2. **Scheduling** – Plan ahead with a visual calendar  
-3. **Routines** – Build daily habits with reminders  
-4. **Dashboard** – Analyze your productivity insights  
+1. **Tasks** – Manage your to-dos with both Board and List views  
+2. **Scheduling** – Plan ahead and Schedule Tasks with a visual calendar  
+3. **Routines** – Build daily habits and Follow routines with reminders  
+4. **Dashboard** – View your Progress and Analyze your productivity insights  
 
 ---
 
-## 🧩 Task Management
+## 🧩 Tasks
 - Create, edit, and delete tasks  
-- Switch between **Board View** (Kanban-style) and **List View**  
+- Switch between **Board View** and **List View** to fit your style
 - Organize and filter tasks for clarity  
 - Intuitive interface designed to keep you moving forward  
 
