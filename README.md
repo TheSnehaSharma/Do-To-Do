@@ -22,14 +22,22 @@ Visit the site Live at https://dotodo-one.vercel.app/
 - Create, edit, and delete tasks  
 - Switch between **Board View** and **List View** to fit your style
 - Organize and filter tasks for clarity  
-- Intuitive interface designed to keep you moving forward  
+- Intuitive interface designed to keep you moving forward
+<p align="center">
+  <img src="Screenshots/Board%20View.png" alt="Board View" width="500">
+  <img src="Screenshots/List%20View.png" alt="List View" width="500">
+</p>
 
 ---
 
 ## 📅 Scheduling
 - Schedule tasks using the built-in calendar  
 - View tasks by day, week, or month  
-- Identify overloaded or free days at a glance  
+- Identify overloaded or free days at a glance
+<p align="center">
+  <img src="Screenshots/Month%20Calendar.png" alt="Month Calendar" width="500">
+  <img src="Screenshots/Day%20Calendar.png" alt="Day Calendar" width="500">
+</p>
 
 ---
 
@@ -37,13 +45,18 @@ Visit the site Live at https://dotodo-one.vercel.app/
 - Create personalized daily routines  
 - Receive automated reminders  
 - Build long-term consistency  
-
+<p align="center">
+  <img src="Screenshots/Routines.png" alt="Routines" width="500">
+</p>
 ---
 
 ## 🌗 Dark Mode
 - Toggle seamless **Dark Mode** for nighttime productivity  
 - Preserves colors and theme levels perfectly  
-
+<p align="center">
+  <img src="Screenshots/Light%20Mode.png" alt="Light Mode" width="500">
+  <img src="Screenshots/Dark%20Mode.png" alt="Dark Mode" width="500">
+</p>
 ---
 
 ## 🏖️ Vacation Mode
@@ -73,22 +86,19 @@ Your UI theme changes dynamically as your score grows.
 ## 📊 Productivity Dashboard
 - Visualize completed, overdue, and upcoming tasks  
 - Track daily consistency and routine performance  
-- Understand patterns to improve efficiency  
+- Understand patterns to improve efficiency
+<p align="center">
+  <img src="Screenshots/Dashboard.png" alt="Dashboard" width="500">
+  <img src="Screenshots/Analysis.png" alt="Analysis" width="500">
+</p>
 
 ---
 
 ## 🪪 Shareable Profile Card
-- Automatically generated based on your progress  
-- Displays:
-  - Productivity level  
-  - Theme color  
-  - Total tasks completed  
-  - Points and achievements  
-- Share it with friends or on social media  
+<p align="center">
+  <img src="Screenshots/Profile%20Card.png" alt="Profile Card" width = 200 align=right>
+  Automatically generated Profile Card based on your progress, which displays Productivity level, Theme color, Total tasks completed and Streak along with unocked avatars.
+</p>
 
 ---
 
-## 🖼️ Screenshots
-> *(Add screenshots or GIF demos here.)*
-
----
